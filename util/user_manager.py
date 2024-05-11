@@ -1,41 +1,39 @@
 import os
 import time
-from src.user import User
+from util.dice_game import DiceGame
+from util.user import User
 
 class UserManager:
     def __init__(self):
-        username = None
         self.user_folder = "user_data"
-        self.user_file = os.path.join(self.user_folder, f"{username}.txt")
+        self.user_file = os.path.join(self.user_folder, "users.txt")
         self.create_user_folder()
         
     def create_user_folder(self):
         if not os.path.exists(self.user_folder):
             os.makedirs(self.user_folder)
 
-    def load_users(self, username):
-        try:
-            self.user_file = os.path.join(self.user_folder, f"{username}.txt")
+    def load_users(self):
+        users = {}
+        if os.path.exists(self.user_file):
             with open(self.user_file, "r") as file:
-                return file.read()
-        except FileNotFoundError:
-            return None
+                for line in file:
+                    username, password = line.strip().split(",")
+                    users[username] = password
+        return users
 
-    def save_users(self, username, password):
-        self.user_file = os.path.join(self.user_folder, f"{username}.txt")
+    def save_users(self, users):
         with open(self.user_file, "w") as file:
-            file.write(password)
-        
+            for username, password in users.items():
+                file.write(f"{username},{password}\n")
+
     def validate_username(self, username):
-        if not os.path.exists(os.path.join(self.user_folder, f"{username}.txt")):
-            return False
-        return True
+        users = self.load_users()
+        return username in users
 
     def validate_password(self, username, password):
-        stored_password = self.load_users(username)
-        if stored_password.strip() == password:
-            return True
-        return False
+        users = self.load_users()
+        return users.get(username) == password
 
     def register(self):
         while True:
@@ -48,7 +46,7 @@ class UserManager:
                 print("Username must be at least 4 characters long.")
                 input("Press Enter to continue...")
                 continue
-            if os.path.exists(os.path.join(self.user_folder, f"{username}.txt")):
+            if self.validate_username(username):
                 print("Username already exists.")
                 input("Press Enter to continue...")
                 continue
@@ -60,7 +58,10 @@ class UserManager:
                 print("Password must be at least 8 characters long.")
                 input("Press Enter to continue...")
                 continue
-            self.save_users(username, password)
+
+            users = self.load_users()
+            users[username] = password
+            self.save_users(users)
             print("Registration Successful.")
             time.sleep(1)
             return
@@ -72,16 +73,19 @@ class UserManager:
             username = input("Enter Username, or leave blank to cancel: ")
             if not username:
                 return
-            if self.validate_username(username) == False:
+            if not self.validate_username(username):
                 print("Username does not exist.")
                 input("Press Enter to Continue...")
                 continue
             password = input("Enter Password, or leave blank to cancel: ")
             if not password:
                 return
-            if self.validate_password(username, password) == False:
+            if not self.validate_password(username, password):
                 print("Incorrect password. Try again")
                 input("Press Enter to Continue...")
                 continue
-            game = User(username)
-            game.user_menu()
+            User(username, password)
+            usermenu = DiceGame(username)
+            usermenu.menu()
+            
+            return
