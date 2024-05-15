@@ -1,3 +1,5 @@
+from datetime import datetime
+
 class Score:
 	def __init__(self, username, game_id, points = 0, wins = 0):
 		self.username = username
@@ -5,5 +7,17 @@ class Score:
 		self.points = points
 		self.wins = wins
 	
-	def __str__(self):
-		return f"Username: {self.username}, Points: {self.points}, Stages Won: {self.wins}"
+	def update_score(self, points, wins):
+		self.points += points
+		self.wins += wins
+	
+	def reset_score(self, points):
+		points = 0
+
+	def reset_overall_score(self):
+		self.points = 0
+		self.wins = 0
+	
+	def to_record(self):
+		self.game_id = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		return self.username, self.points, self.wins, self.game_id
