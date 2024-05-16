@@ -102,32 +102,34 @@ class DiceGame:
 				user_pts += 3
 				stage_wins += 1
 				self.score.update_score(user_pts, stage_wins) #update overall score
-				print(f"""=========================================\n	You won this stage, {self.username}!\n=========================================""")
+				print(f"{"="*50}\n	   You won this stage, {self.username}!\n{"="*50}")
 
 				if continue_game():
 					stage += 1 
 					continue
 				else:
 					score_saving()
-					if stage_wins < 1:
-						print(f"--Game Over. You won {stage_wins} stage.--")
-					print(f"--Game Over. You won {stage_wins} stages.--")
+					if stage_wins < 2:
+						print(f"{"="*50}\n     Game Over. You won {stage_wins} stage.\n{"="*50}")
+					else:
+						print(f"{"="*50}\n     Game Over. You won {stage_wins} stages.\n{"="*50}")
 					break
 
 			if cpu_pts > user_pts:
 				if stage_wins == 0: #if no wins
 					print(f"\nYou lost this stage.\n")
-					print("--Game Over. You didn't win any stages.--")
+					print(f"{"="*50}\n	   Game Over. You didn't win any stages.\n{"="*50}")
 					input("Press Enter to Continue...")
 					break
 
 				score_saving()
 				self.score.update_score(user_pts, 0) #same kanina
 
-				print(f"You lost this stage.")
-				if stage_wins < 1:
-					print(f"Game Over. You won {stage_wins} stage.")
-				print(f"Game Over. You won {stage_wins} stages.")
+				print(f"\nYou lost this stage.\n")
+				if stage_wins < 2:
+					print(f"{"="*50}\n     Game Over. You won {stage_wins} stage.\n{"="*50}")
+				else:
+					print(f"{"="*50}\n     Game Over. You won {stage_wins} stages.\n{"="*50}")
 				input("Press Enter to Continue...")
 				break
 
