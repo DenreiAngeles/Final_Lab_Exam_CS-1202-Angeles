@@ -89,7 +89,9 @@ class DiceGame:
 				user_pts += 3
 				stage_wins += 1
 				self.score.update_score(user_pts, stage_wins) #update overall score
-				self.score.reset_score(user_pts) #reset game score
+				user_pts, cpu_pts = self.score.reset_score() #reset game score
+				print(f"{cpu_pts},{user_pts}")
+				input("Press Enter to continue")
 				print(f"\nYou won this stage! {self.username}\n")
 
 				if self.continue_game(): 
@@ -106,13 +108,13 @@ class DiceGame:
 
 			if cpu_pts > user_pts:
 				if stage_wins == 0: #if no wins
-					self.score.reset_score(user_pts)
+					user_pts, cpu_pts = self.score.reset_score()
 					print(f"\nYou lost this stage.\n")
 					print("Game Over. You didn't win any stages.")
 					input("Press Enter to Continue...")
 					break
 				self.score.update_score(user_pts, stage_wins) #same kanina
-				self.score.reset_score(user_pts)
+				user_pts, cpu_pts = self.score.reset_score()
 				top_scores = self.load_scores()
 				top_scores.append((self.score.to_record()))
 				top_scores.sort(key=lambda x: x[1], reverse=True)

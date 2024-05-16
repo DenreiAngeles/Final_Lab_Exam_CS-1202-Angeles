@@ -17,6 +17,8 @@ def main():
                 login = DiceGame(user.username)
                 login.menu()
         elif choice == "3":
+            print("Exiting...")
+            time.sleep(0.5)
             print("Goodbye!")
             break
         else:

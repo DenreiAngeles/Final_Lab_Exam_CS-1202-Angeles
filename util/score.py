@@ -1,4 +1,5 @@
 from datetime import datetime
+from util.user import User
 
 class Score:
 	def __init__(self, username, game_id, points = 0, wins = 0):
@@ -11,8 +12,8 @@ class Score:
 		self.points += points
 		self.wins += wins
 	
-	def reset_score(self, points):
-		points = 0
+	def reset_score(self):
+		return 0, 0
 
 	def reset_overall_score(self):
 		self.points = 0

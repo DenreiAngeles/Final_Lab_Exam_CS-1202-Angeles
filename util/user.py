@@ -3,11 +3,9 @@ import os
 import time
 
 class User:
-    def __init__(self, username, password, points = 0, stages_won = 0):
+    def __init__(self, username, password):
         self.username = username
         self.password = password
-        self.points = points
-        self.stages_won = stages_won
         self.um = UserManager()
 
     def register(self):
