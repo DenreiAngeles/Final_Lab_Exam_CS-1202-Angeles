@@ -1,4 +1,6 @@
 import os
+import time
+from util.dice_game import DiceGame
 
 class UserManager:
     def __init__(self):
@@ -32,14 +34,54 @@ class UserManager:
         users = self.load_users()
         return users[username] == password
 
-    def register(self, username, password):
-        users = self.load_users()
-        users[username] = password
-        self.save_users(users)
+    def register(self):
+        while True:
+            os.system('cls')
+            print("Registration:\n")
+            username = input("Enter username (at least 4 characters), or leave blank to cancel: ")
+            if not username:
+                return
+            if len(username) < 4:
+                print("Username must be at least 4 characters long.")
+                input("Press Enter to continue...")
+                continue
+            if self.validate_username(username):
+                print("Username already exists.")
+                input("Press Enter to continue...")
+                continue
+            
+            password = input("Enter password (at least 8 characters), or leave blank to cancel: ")
+            if not password:
+                return
+            if len(password) < 8:
+                print("Password must be at least 8 characters long.")
+                input("Press Enter to continue...")
+                continue
+            users = self.load_users()
+            users[username] = password
+            self.save_users(users)
+            print("Registration Successful.")
+            time.sleep(1)
+            return
 
-    def login(self, username, password):
-        if not self.validate_username(username):
-            return "Username does not exist."
-        if not self.validate_password(username, password):
-            return "Incorrect password. Try again"
-        return "Login Successful."
+    def login(self):
+        while True:
+            os.system('cls')
+            print("Login:\n")
+            username = input("Enter Username, or leave blank to cancel: ")
+            if not username:
+                return
+            if not self.validate_username(username):
+                print("Username does not exist.")
+                continue
+            password = input("Enter Password, or leave blank to cancel: ")
+            if not password:
+                return
+            if not self.validate_password(username, password):
+                print("Incorrect Password.")
+                continue
+            menu = DiceGame(username)
+            menu.menu()
+            break
+                
+

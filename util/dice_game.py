@@ -31,34 +31,44 @@ class DiceGame:
 		with open(self.score_file, "w") as file:
 			for username, score, wins, game_id in scores:
 				file.write(f"{username},{score},{wins},{game_id}\n")
-	
-	def continue_game(self):
-		while True:
-			cont = input("\nDo you want to continue to the next stage? (1 for Yes, 0 for No): ")
-			if cont == "1":
-				return True
-			if cont == "0":
-				return False
-			else:
-				print("Invalid input. Please enter 1 for Yes or 0 for No")
-				input("Press Enter to Continue...")
-				continue
-
 
 	def play_game(self):
 		os.system('cls')
 		print(f"Starting game as {self.username}...")
-		cpu_pts = 0
-		user_pts = 0
 		stage_wins = 0
 
 		while True:
-			for i in range(3):
-				cpu_roll = random.randint(1, 6)
-				user_roll = random.randint(1, 6)
+			cpu_pts = 0
+			user_pts = 0
 
+			def continue_game():
+				while True:
+					cont = input("\nDo you want to continue to the next stage? (1 for Yes, 0 for No): ")
+					if cont == "1":
+						return True
+					if cont == "0":
+						return False
+					else:
+						print("Invalid input. Please enter 1 for Yes or 0 for No")
+						input("Press Enter to Continue...")
+						continue
+
+			def score_saving():
+				top_scores = self.load_scores()
+				top_scores.append((self.score.to_record()))
+				top_scores.sort(key=lambda x: x[1], reverse=True)
+				top_scores = top_scores[:10]
+				self.save_scores(top_scores)
+				self.score.reset_overall_score()
+
+			def roll_display():
+				cpu_roll, user_roll = random.randint(1, 6), random.randint(1, 6)
 				print(f"{self.username} rolled: {user_roll}")
 				print(f"CPU rolled: {cpu_roll}")
+				return cpu_roll, user_roll
+			
+			for _ in range(3):
+				cpu_roll, user_roll = roll_display()
 				if cpu_roll < user_roll:
 					user_pts += 1
 					print(f"You win this round! {self.username}\n")
@@ -71,14 +81,10 @@ class DiceGame:
 			
 			if cpu_pts == user_pts: #for best of three if game is tied
 				while cpu_pts == user_pts:
-					cpu_roll = random.randint(1, 6)
-					user_roll = random.randint(1, 6)
-
-					print(f"{self.username} rolled: {user_roll}")
-					print(f"CPU rolled: {cpu_roll}")
+					cpu_roll, user_roll = roll_display()
 					if cpu_roll < user_roll:
 						user_pts += 1
-						print(f"You win this round, {self.username}!\n")
+						print(f"You win this round! {self.username}\n")
 					if cpu_roll > user_roll:
 						cpu_pts += 1
 						print("CPU wins this round!\n")
@@ -90,45 +96,30 @@ class DiceGame:
 				user_pts += 3
 				stage_wins += 1
 				self.score.update_score(user_pts, stage_wins) #update overall score
-				user_pts, cpu_pts = self.score.reset_score() #reset game score
 				print(f"\nYou won this stage, {self.username}!\n")
 
-				if self.continue_game(): 
+				if continue_game(): 
 					continue
 				else:
-					top_scores = self.load_scores() #list
-					top_scores.append((self.score.to_record())) #add username, score, wins, date
-					top_scores.sort(key=lambda x: x[1], reverse=True) #lambda x as criteria, reverse=True to reverse sort
-					top_scores = top_scores[:10] #slice to only the first 10 index
-					self.save_scores(top_scores) #save scores
-					self.score.reset_overall_score() #reset overall score
+					score_saving()
 					if stage_wins < 1:
 						print(f"Game Over. You won {stage_wins} stage.")
-					else:
-						print(f"Game Over. You won {stage_wins} stages.")
+					print(f"Game Over. You won {stage_wins} stages.")
 					break
 
 			if cpu_pts > user_pts:
 				if stage_wins == 0: #if no wins
-					user_pts, cpu_pts = self.score.reset_score()
 					print(f"\nYou lost this stage.\n")
 					print("Game Over. You didn't win any stages.")
 					input("Press Enter to Continue...")
 					break
-				
+				score_saving()
 				self.score.update_score(user_pts, 0) #same kanina
-				user_pts, cpu_pts = self.score.reset_score()
-				top_scores = self.load_scores()
-				top_scores.append((self.score.to_record()))
-				top_scores.sort(key=lambda x: x[1], reverse=True)
-				top_scores = top_scores[:10]
-				self.save_scores(top_scores)
-				self.score.reset_overall_score()
+
 				print(f"You lost this stage.")
 				if stage_wins < 1:
 					print(f"Game Over. You won {stage_wins} stage.")
-				else:
-					print(f"Game Over. You won {stage_wins} stages.")
+				print(f"Game Over. You won {stage_wins} stages.")
 				input("Press Enter to Continue...")
 				break
 
@@ -144,7 +135,7 @@ class DiceGame:
 
 	def logout(self): 
 		print(f"Goodbye, {self.username}")
-		print("You logged out successfully")
+		print("You logged out successfully.")
 		time.sleep(1)
 		return True
 
@@ -160,7 +151,7 @@ class DiceGame:
 			elif choice == "2":
 				self.show_top_scores()
 			elif choice == "3":
-				if self.logout() == True:
+				if self.logout():
 					return
 			else:
 				print("Invalid choice. Please Try Again")
