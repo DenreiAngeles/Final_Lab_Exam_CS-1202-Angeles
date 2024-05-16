@@ -78,19 +78,20 @@ class DiceGame:
 					print(f"CPU rolled: {cpu_roll}")
 					if cpu_roll < user_roll:
 						user_pts += 1
-						print(f"You win this round! {self.username}\n")
+						print(f"You win this round, {self.username}!\n")
 					if cpu_roll > user_roll:
 						cpu_pts += 1
 						print("CPU wins this round!\n")
 					if cpu_roll == user_roll:
 						print("It's a tie!\n")
+					time.sleep(1)
 		
 			if cpu_pts < user_pts: #user wins
 				user_pts += 3
 				stage_wins += 1
 				self.score.update_score(user_pts, stage_wins) #update overall score
 				user_pts, cpu_pts = self.score.reset_score() #reset game score
-				print(f"\nYou won this stage! {self.username}\n")
+				print(f"\nYou won this stage, {self.username}!\n")
 
 				if self.continue_game(): 
 					continue
@@ -101,7 +102,10 @@ class DiceGame:
 					top_scores = top_scores[:10] #slice to only the first 10 index
 					self.save_scores(top_scores) #save scores
 					self.score.reset_overall_score() #reset overall score
-					print(f"Game Over. You won {stage_wins} stages")
+					if stage_wins < 1:
+						print(f"Game Over. You won {stage_wins} stage.")
+					else:
+						print(f"Game Over. You won {stage_wins} stages.")
 					break
 
 			if cpu_pts > user_pts:
@@ -111,7 +115,8 @@ class DiceGame:
 					print("Game Over. You didn't win any stages.")
 					input("Press Enter to Continue...")
 					break
-				self.score.update_score(user_pts, stage_wins) #same kanina
+				
+				self.score.update_score(user_pts, 0) #same kanina
 				user_pts, cpu_pts = self.score.reset_score()
 				top_scores = self.load_scores()
 				top_scores.append((self.score.to_record()))
@@ -120,7 +125,10 @@ class DiceGame:
 				self.save_scores(top_scores)
 				self.score.reset_overall_score()
 				print(f"You lost this stage.")
-				print(f"Game Over. You won {stage_wins} stages")
+				if stage_wins < 1:
+					print(f"Game Over. You won {stage_wins} stage.")
+				else:
+					print(f"Game Over. You won {stage_wins} stages.")
 				input("Press Enter to Continue...")
 				break
 
