@@ -17,15 +17,12 @@ class DiceGame:
 
 	def load_scores(self):
 		scores = []	
-		try:
-			if os.path.exists(self.score_file):
-				with open(self.score_file, "r") as file:
-					for line in file:
-						username, score, stage_score, date = line.strip().split(",")
-						scores.append((username,int(score),int(stage_score), date))
-			return scores
-		except FileNotFoundError:
-			return None
+		if os.path.exists(self.score_file):
+			with open(self.score_file, "r") as file:
+				for line in file:
+					username, score, stage_score, date = line.strip().split(",")
+					scores.append((username,int(score),int(stage_score), date))
+		return scores
 
 	def save_scores(self, scores):
 		with open(self.score_file, "w") as file:
@@ -34,12 +31,17 @@ class DiceGame:
 
 	def play_game(self):
 		os.system('cls')
-		print(f"Starting game as {self.username}...")
+		print(f"Starting game as {self.username}...\n")
 		stage_wins = 0
+		stage = 1
 
 		while True:
 			cpu_pts = 0
 			user_pts = 0
+			def stage_display(stage):
+				print('=============================')
+				print(f'           STAGE {stage}         ')
+				print('=============================')
 
 			def continue_game():
 				while True:
@@ -61,14 +63,17 @@ class DiceGame:
 				self.save_scores(top_scores)
 				self.score.reset_overall_score()
 
-			def roll_display():
+			def roll_display(round):
 				cpu_roll, user_roll = random.randint(1, 6), random.randint(1, 6)
+				print(f"--Round {round}--")
 				print(f"{self.username} rolled: {user_roll}")
 				print(f"CPU rolled: {cpu_roll}")
 				return cpu_roll, user_roll
 			
-			for _ in range(3):
-				cpu_roll, user_roll = roll_display()
+			stage_display(stage)
+			
+			for round in range(3):
+				cpu_roll, user_roll = roll_display(round+1)
 				if cpu_roll < user_roll:
 					user_pts += 1
 					print(f"You win this round! {self.username}\n")
@@ -81,7 +86,8 @@ class DiceGame:
 			
 			if cpu_pts == user_pts: #for best of three if game is tied
 				while cpu_pts == user_pts:
-					cpu_roll, user_roll = roll_display()
+					round += 1
+					cpu_roll, user_roll = roll_display(round+1)
 					if cpu_roll < user_roll:
 						user_pts += 1
 						print(f"You win this round! {self.username}\n")
@@ -96,23 +102,25 @@ class DiceGame:
 				user_pts += 3
 				stage_wins += 1
 				self.score.update_score(user_pts, stage_wins) #update overall score
-				print(f"\nYou won this stage, {self.username}!\n")
+				print(f"""=========================================\n	You won this stage, {self.username}!\n=========================================""")
 
-				if continue_game(): 
+				if continue_game():
+					stage += 1 
 					continue
 				else:
 					score_saving()
 					if stage_wins < 1:
-						print(f"Game Over. You won {stage_wins} stage.")
-					print(f"Game Over. You won {stage_wins} stages.")
+						print(f"--Game Over. You won {stage_wins} stage.--")
+					print(f"--Game Over. You won {stage_wins} stages.--")
 					break
 
 			if cpu_pts > user_pts:
 				if stage_wins == 0: #if no wins
 					print(f"\nYou lost this stage.\n")
-					print("Game Over. You didn't win any stages.")
+					print("--Game Over. You didn't win any stages.--")
 					input("Press Enter to Continue...")
 					break
+
 				score_saving()
 				self.score.update_score(user_pts, 0) #same kanina
 
@@ -142,10 +150,12 @@ class DiceGame:
 	def menu(self):
 		while True:
 			os.system("cls")
-			print(f"Welcome, {self.username}")
-			print("Menu:")
+			print('-'*20)
+			print(f"   Welcome, {self.username}!")
+			print('-'*20)
+			print("\n=====MENU=====")
 			print("1. Start Game\n2. Show Top Scores\n3. Log Out")
-			choice = input("Enter the number of your choice: ")
+			choice = input("\nEnter the number of your choice: ")
 			if choice == "1":
 				self.play_game()
 			elif choice == "2":

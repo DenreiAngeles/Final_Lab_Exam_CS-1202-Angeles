@@ -7,9 +7,11 @@ def main():
     while True:
         os.system('cls')
         user = UserManager()
-        print("Welcome to Dice Roll Game!")
+        print('-'*50)
+        print("           Welcome to Dice Roll Game!")
+        print('-'*50)
         print("1. Register\n2. Login\n3. Exit")
-        choice = input("Enter the number of your choice: ")
+        choice = input("\nEnter the number of your choice: ")
         if choice == "1":
             user.register()
         elif choice == "2":
